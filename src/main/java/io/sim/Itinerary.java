@@ -1,6 +1,7 @@
 package io.sim;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,10 +19,13 @@ public class Itinerary {
 	private String uriItineraryXML;
 	private String[] itinerary;
 	private String idItinerary;
+	private ArrayList<Rota> listaRoutes; 
 
 	public Itinerary(String _uriRoutesXML, String _idRoute) {
 		this.uriItineraryXML = _uriRoutesXML;
 		this.idItinerary = _idRoute;
+		listaRoutes = new ArrayList<Rota>();
+		
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -35,6 +39,8 @@ public class Itinerary {
 					Node node = elem.getElementsByTagName("route").item(0);
 					Element edges = (Element) node;
 					this.itinerary = new String[] { idRouteAux, edges.getAttribute("edges") };
+					listaRoutes.add(new Rota(Integer.toString(i),edges.getAttribute("edges")));
+					
 				}
 			}
 
@@ -70,5 +76,17 @@ public class Itinerary {
 
 	public boolean isOn() {
 		return this.on;
+	}
+
+	public String[] getItinerary1(int i) {
+		return this.listaRoutes.get(i).getRouteItinerary();
+	}
+
+	public String getIdItinerary1(int i) {
+		return this.listaRoutes.get(i).getId();
+	}
+
+	public ArrayList<Rota> getRoutes(){
+		return listaRoutes;
 	}
 }

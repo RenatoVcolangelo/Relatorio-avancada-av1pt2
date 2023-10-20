@@ -1,70 +1,58 @@
 package io.sim;
-
 import de.tudresden.sumo.cmd.Route;
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
+
 public class TransportService extends Thread {
 
 	private String idTransportService;
-	private boolean on_off;
 	private SumoTraciConnection sumo;
 	private Auto auto;
-	private Itinerary itinerary;
+	private Rota route;
 
-	public TransportService(boolean _on_off, String _idTransportService, Itinerary _itinerary, Auto _auto,
-			SumoTraciConnection _sumo) {
+	public TransportService(String _idTransportService, Auto _auto,
+			SumoTraciConnection _sumo, Rota route) {
 
-		this.on_off = _on_off;
+
 		this.idTransportService = _idTransportService;
-		this.itinerary = _itinerary;
 		this.auto = _auto;
 		this.sumo = _sumo;
+		this.route = route;
+
 	}
 
 	@Override
 	public void run() {
-		try {
+
+            synchronized(this){
+                try {
+                    this.initializeRoutes();	
+                    Thread.sleep(this.auto.getAcquisitionRate());
+                    notify();
+                } catch (InterruptedException e) {
+                    
+                    e.printStackTrace();
+                }	}					
 			
-			this.initializeRoutes();
-
-			this.auto.start();
-
-			while (this.on_off) {
-				try {
-					this.sumo.do_timestep();
-				} catch (Exception e) {
-				}
-				Thread.sleep(this.auto.getAcquisitionRate());
-				if (this.getSumo().isClosed()) {
-					this.on_off = false;
-					System.out.println("SUMO is closed...");
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void initializeRoutes() {
 
 		SumoStringList edge = new SumoStringList();
 		edge.clear();
-		String[] aux = this.itinerary.getItinerary();
+		String aux = this.route.getEdge();
 
-		for (String e : aux[1].split(" ")) {
+		for (String e : aux.split(" ")) {
 			edge.add(e);
 		}
 
 		try {
-			sumo.do_job_set(Route.add(this.itinerary.getIdItinerary(), edge));
-			//sumo.do_job_set(Vehicle.add(this.auto.getIdAuto(), "DEFAULT_VEHTYPE", this.itinerary.getIdItinerary(), 0,
-			//		0.0, 0, (byte) 0));
+			sumo.do_job_set(Route.add(this.route.getId(), edge));
 			
 			sumo.do_job_set(Vehicle.addFull(this.auto.getIdAuto(), 				//vehID
-											this.itinerary.getIdItinerary(), 	//routeID 
+											this.route.getId(), 	            //routeID 
 											"DEFAULT_VEHTYPE", 					//typeID 
 											"now", 								//depart  
 											"0", 								//departLane 
@@ -82,18 +70,14 @@ public class TransportService extends Thread {
 			
 			sumo.do_job_set(Vehicle.setColor(this.auto.getIdAuto(), this.auto.getColorAuto()));
 			
+			
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			System.out.println("Erro aqui");
+			//e1.printStackTrace();
 		}
+
 	}
 
-	public boolean isOn_off() {
-		return on_off;
-	}
-
-	public void setOn_off(boolean _on_off) {
-		this.on_off = _on_off;
-	}
 
 	public String getIdTransportService() {
 		return this.idTransportService;
@@ -107,7 +91,9 @@ public class TransportService extends Thread {
 		return this.auto;
 	}
 
-	public Itinerary getItinerary() {
-		return this.itinerary;
+	public Rota getRoute(){
+		return this.route;
 	}
+
+
 }
