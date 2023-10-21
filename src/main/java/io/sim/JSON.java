@@ -1,10 +1,11 @@
 package io.sim;
 
-//import org.json.simple.JSONObject;
 import org.json.JSONObject;
 
+// Faz a conversão dos dados para json e de json para dados
 public class JSON {
 
+    // Retorna uma string no formato JSON dos dados de uma transação
     public static String dadosTrasacao2JSON(String login, String senha, int conta_paga, int conta_recebe, double valor){
         JSONObject obj = new JSONObject();
         obj.put("login", login);
@@ -14,14 +15,13 @@ public class JSON {
         obj.put("valor", valor);
         return obj.toString();
     }
-
+    // Reconstroi um objeto JSON de uma string de dados de transação
     public static JSONObject dadosJSON2Transacao(String transacao){
         JSONObject obj = new JSONObject(transacao);
         return obj;
     }
 
-  
-
+    // Retorna um objeto JSON dos dados de DataDriving
     public static JSONObject drivingData2JSON(DrivingData _DrivingData)
 	{
         JSONObject obj = new JSONObject();
@@ -51,6 +51,7 @@ public class JSON {
         return obj;
 	}
 
+    // Reconstroi um DataDriving a partir de uma string no formato json 
     public static DrivingData stringToDrivingData(String _string)
 	{
 		JSONObject obj = new JSONObject(_string);

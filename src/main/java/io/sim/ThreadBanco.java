@@ -7,7 +7,7 @@ import java.net.Socket;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
-
+// Thread que gerencia as transações financeiras
 public class ThreadBanco extends Thread{
 
     private Socket socket;
@@ -27,6 +27,7 @@ public class ThreadBanco extends Thread{
     public void run() {
 
         try {
+            // recebe dados do botpayment
             DataInputStream entrada = new DataInputStream(socket.getInputStream());
 
             while(on_ff){
@@ -36,6 +37,7 @@ public class ThreadBanco extends Thread{
                 String mensagem = Criptografia.decrypt(cripto);
                 JSONObject obj = JSON.dadosJSON2Transacao(mensagem);
                 try{
+                    // fecha a conexão
                 if(obj.getString("acabou").equals("true")){
                     on_ff = false;
                     break;
@@ -51,6 +53,8 @@ public class ThreadBanco extends Thread{
                 String login = obj.getString("login");
                 String senha = obj.getString("senha");
 
+                
+                // confere se o login e senha estao no hashmap do banco
                 if(this.banco.confereConta(login,senha)){
                     pagamento();
                 } else{
@@ -73,7 +77,7 @@ public class ThreadBanco extends Thread{
         
     }
 
-
+    // verifica a possibilidade da transação
     public boolean transacao(){
 
 		if(pagador.getSaldo() < valor){
@@ -87,6 +91,7 @@ public class ThreadBanco extends Thread{
 		}
 	}
 
+    // realiza o pagamento e adiciona a transação ao arraylist de transações do banco
     public void pagamento(){
         if(transacao()){
             System.out.println("Saldo conta " + recebedor.getId() + " " + recebedor.getSaldo());

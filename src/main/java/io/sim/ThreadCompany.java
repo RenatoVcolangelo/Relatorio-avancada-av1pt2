@@ -6,25 +6,18 @@ import java.io.IOException;
 import java.net.Socket;
 import org.json.JSONObject;
 
-
+// Gerencia a comunicação car/company, analisa o estado do carro e faz pagamentos
 public class ThreadCompany extends Thread{
-    public static boolean acabou = true;
+
     private Socket carroSocket;
     private Socket bancoSocket;
     private Company company;
-    String timestamp;
-    String AutoID;
-    String RouteID;
-    String Speed;
-    String odometro;
-    String autoState = "";
-    String bateu1km = "";
-    String routeID;
-    String mensagem;
-
+    private String autoState = "";
+    private String bateu1km = "";
+    private String routeID;
+    private String mensagem;
     private int contaDriver;
-    private JSONObject saidarotas = new JSONObject();
-
+    private JSONObject texto = new JSONObject();
     private boolean on_off = true;
 
     
@@ -38,7 +31,7 @@ public class ThreadCompany extends Thread{
     public void run(){
 
             try {
-
+                // conecta com o carro e tem acesso a conexão da company com o banco
                 DataOutputStream saida = new DataOutputStream(carroSocket.getOutputStream());
                 DataInputStream entrada = new DataInputStream(carroSocket.getInputStream());
                 DataOutputStream saidaBanco = new DataOutputStream(bancoSocket.getOutputStream());
@@ -46,33 +39,33 @@ public class ThreadCompany extends Thread{
             
             while(on_off){
 
+            // recebe o tamanho da mensagem, a lê, descriptografa, poe em JSON e identifica o estado do carro
                 int tam = entrada.readInt();  
                 byte[] cripto = entrada.readNBytes(tam);
-                String mensagem = Criptografia.decrypt(cripto);
-
-            
+                mensagem = Criptografia.decrypt(cripto);
                 JSONObject obj = new JSONObject(mensagem);
 
                 autoState = obj.getString("autoState");
 
-
+                // Se estiver esperando rota e existir rotas nao executadas a thread envia uma rota criptografada
                 if(autoState.equals("esperando")){
                     if(this.company.getRoutesNExe().size() > 0){
                     
                         Rota r = company.getRoute();
-                        saidarotas.put("IDRoute",r.getId());
-                        saidarotas.put("Edges",r.getEdge());
-                        cripto = Criptografia.encrypt(saidarotas.toString());
+                        texto.put("IDRoute",r.getId());
+                        texto.put("Edges",r.getEdge());
+                        cripto = Criptografia.encrypt(texto.toString());
         
                         saida.writeInt(cripto.length);
                         saida.write(cripto);
 
                         System.out.println("Rota enviada");}
 
+                    // caso nao exista rotas a serem executadas, indica ao carro para finalizar
                     else{
-                        saidarotas.put("RotasFinalizadas","true");
+                        texto.put("RotasFinalizadas","true");
 
-                        cripto = Criptografia.encrypt(saidarotas.toString());
+                        cripto = Criptografia.encrypt(texto.toString());
         
                         saida.writeInt(cripto.length);
                         saida.write(cripto);
@@ -80,7 +73,7 @@ public class ThreadCompany extends Thread{
                     }
                 }
 
-
+                // quando um carro finaliza uma rota, indica a company para atualizar suas listas de rotas
                 else if(autoState.equals("rotaFinalizada")){
 
                     routeID = obj.getString("routeId");
@@ -88,7 +81,8 @@ public class ThreadCompany extends Thread{
                     System.out.println("Rota " + routeID + " concluida");
 
                 }
-
+                // quando esta executando, confere se o carro bateu 1km e precisa ser pago
+                // também recebe um DataDriving do carro e o adiciona ao arraylist da company
                 else if(autoState.equals("executando")){
 
                 
@@ -102,6 +96,7 @@ public class ThreadCompany extends Thread{
                         bot.start();
                     }
                 }
+                // carro recebe info para fechar, e retorna confirmação
                 else if(autoState.equals("finalizado")){
                     on_off = false; 
                     entrada.close();

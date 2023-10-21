@@ -7,9 +7,11 @@ import java.io.IOException;
 
 
 public class Relatorio {
+    // Nomes dos arquivos para relatórios de automóveis e transações
     private static final String fileNameAuto = "RelatorioAuto.xlsx";
     private static final String fileNameTransacao = "RelatorioTransacao.xlsx";
 
+    // Método para criar um arquivo Excel para relatório de automóveis
     public static synchronized void criaExcelAuto(){
         try{
 
@@ -21,7 +23,7 @@ public class Relatorio {
             int lastRow = 0;
             Row row = sheet.createRow(lastRow);
 
-            // Crie uma célula e defina seu valor
+            // Cria o cabeçalho
             Cell TimeStamp = row.createCell(0);
             TimeStamp.setCellValue("TimeStamp");
             Cell CarID = row.createCell(1);
@@ -38,10 +40,11 @@ public class Relatorio {
             Type.setCellValue("Fuel Type");
             Cell CO2Emission = row.createCell(7);
             CO2Emission.setCellValue("CO2Emission");
-            Cell Latitude = row.createCell(7);
+            Cell Latitude = row.createCell(8);
             Latitude.setCellValue("Latitude");
-            Cell Longitude = row.createCell(7);
+            Cell Longitude = row.createCell(9);
             Longitude.setCellValue("Longitude");
+
 
              // Salve o arquivo Excel em disco
             try (FileOutputStream outputStream = new FileOutputStream(fileNameAuto)) {
@@ -57,6 +60,7 @@ public class Relatorio {
 
     }}
 
+     // Método para criar um arquivo Excel para relatório de transações
      public static synchronized void criaExcelTransacao(){
         try{
 
@@ -68,7 +72,7 @@ public class Relatorio {
             int lastRow = 0;
             Row row = sheet.createRow(lastRow);
 
-            // Crie uma célula e defina seu valor
+            // Cria o cabeçalho
             Cell TimeStamp = row.createCell(0);
             TimeStamp.setCellValue("TimeStamp");
             Cell CarID = row.createCell(1);
@@ -93,17 +97,17 @@ public class Relatorio {
 
     }}
 
-
+    // Método para adicionar dados de automóveis ao arquivo Excel
     public static synchronized void manipulaExcelAuto(DrivingData r){
 
         try{
-
+            // abre o arquivo ja criado
             FileInputStream inputStream = new FileInputStream(fileNameAuto);
             Workbook workbook = WorkbookFactory.create(inputStream);
             FileOutputStream outputStream = new FileOutputStream(fileNameAuto);
             Sheet sheet = workbook.getSheetAt(0);
 
-
+            // pega a ultima linha da planilha
             int lastRow = sheet.getLastRowNum();
 
             Row row = sheet.createRow(lastRow + 1);
@@ -125,20 +129,21 @@ public class Relatorio {
             cell6.setCellValue(r.getFuelType());
             Cell cell7 = row.createCell(7);
             cell7.setCellValue(r.getCo2Emission());
-            Cell cell8 = row.createCell(7);
+            Cell cell8 = row.createCell(8);
             cell8.setCellValue(r.getLatitude());
-            Cell cell9 = row.createCell(7);
+            Cell cell9 = row.createCell(9);
             cell9.setCellValue(r.getLongitude());
+            
 
             workbook.write(outputStream);
         } catch (IOException e){
                 e.printStackTrace();
             }}
-  
+    // Método para adicionar dados de transações ao arquivo Excel
      public static synchronized void manipulaExcelTransacao(Transacao t){
 
         try{
-
+            // abre o arquivo ja criado
             FileInputStream inputStream = new FileInputStream(fileNameTransacao);
             Workbook workbook = WorkbookFactory.create(inputStream);
             FileOutputStream outputStream = new FileOutputStream(fileNameTransacao);

@@ -2,11 +2,9 @@ package io.sim;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,6 +19,7 @@ public class Itinerary {
 	private String idItinerary;
 	private ArrayList<Rota> listaRoutes; 
 
+	// recebe o arquivo de rotas, as separa em um arraylist de Rotas
 	public Itinerary(String _uriRoutesXML, String _idRoute) {
 		this.uriItineraryXML = _uriRoutesXML;
 		this.idItinerary = _idRoute;
@@ -77,14 +76,7 @@ public class Itinerary {
 	public boolean isOn() {
 		return this.on;
 	}
-
-	public String[] getItinerary1(int i) {
-		return this.listaRoutes.get(i).getRouteItinerary();
-	}
-
-	public String getIdItinerary1(int i) {
-		return this.listaRoutes.get(i).getId();
-	}
+	
 
 	public ArrayList<Rota> getRoutes(){
 		return listaRoutes;

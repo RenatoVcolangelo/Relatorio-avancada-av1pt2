@@ -2,6 +2,7 @@ package io.sim;
 
 import java.sql.Timestamp;
 
+// Reune os dados de uma transação 
 public class Transacao {
 
     private int contaPagador;

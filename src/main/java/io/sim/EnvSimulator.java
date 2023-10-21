@@ -12,7 +12,7 @@ public class EnvSimulator extends Thread{
 	private Company company;
 	private Banco alpha;
 	private FuelStation fuelStation;
-	public static int totalDrivers = 100;
+	public static int totalDrivers = 4;
 	
 
     public EnvSimulator(){
@@ -37,7 +37,7 @@ public class EnvSimulator extends Thread{
 			System.out.println("sumo on");
 
 			// Pega as rotas 
-			Itinerary i1= new Itinerary("data/dados.xml", "0");
+			Itinerary i1= new Itinerary("data/dados2.xml", "0");
 
 			// Cria o banco
 			this.alpha = new Banco(22222);

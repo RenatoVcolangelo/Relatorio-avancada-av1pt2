@@ -1,6 +1,6 @@
 package io.sim;
 
-
+// Classe que reune os dados do carro
 public class DrivingData {
 
 	/* SUMO's data */

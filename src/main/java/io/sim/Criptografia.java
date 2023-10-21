@@ -5,7 +5,7 @@ import javax.crypto.spec.IvParameterSpec;
 
 import javax.crypto.Cipher;
 
-// classe que possui os metodos de criptografia
+// classe que possui os metodos para criptografia
 public class Criptografia {
 
  private static String IV = "AAAAAAAAAAAAAAAA";

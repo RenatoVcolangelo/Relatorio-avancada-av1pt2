@@ -1,7 +1,10 @@
 package io.sim;
 import it.polito.appeal.traci.SumoTraciConnection;
 public class Step extends Thread {
+
     private SumoTraciConnection sumo;
+    // Faz a passagem do tempo no SUMO
+    // é inicada no EnvSimulator e termina quando a Company fechar
     public Step(SumoTraciConnection sumo){
         this.sumo = sumo;
     }

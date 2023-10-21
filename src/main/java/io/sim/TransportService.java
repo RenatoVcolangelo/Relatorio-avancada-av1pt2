@@ -12,6 +12,8 @@ public class TransportService extends Thread {
 	private Auto auto;
 	private Rota route;
 
+
+	// Classe que associa uma rota a um carro e o põe para rodar no SUMO
 	public TransportService(String _idTransportService, Auto _auto, SumoTraciConnection _sumo, Rota route) {
 
 		this.idTransportService = _idTransportService;

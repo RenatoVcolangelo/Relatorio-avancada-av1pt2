@@ -18,7 +18,6 @@ public class Auto extends Vehicle implements Runnable{
 	private SumoColor colorAuto;
 	private String driverID;
 	private SumoTraciConnection sumo;
-	private double relativo = 0;
 	private double fuelTank = 3500; //ml
 	private atualizaTanque at;
 	private boolean abastecer = false;
@@ -30,7 +29,8 @@ public class Auto extends Vehicle implements Runnable{
 	private String bateu1km = "0";
 	private int porta = 55555;
 	private int contaDriver;
-	private double distanciaPercorrida;
+	private double distanciaPercorrida; // para 1km
+	private double distancia; // geral
 	private double latinicial;
 	private double longinicial;
 	private double latAtual;
@@ -46,12 +46,12 @@ public class Auto extends Vehicle implements Runnable{
 	private int personCapacity;		// the total number of persons that can ride in this vehicle
 	private int personNumber;		// the total number of persons which are riding in this vehicle
 
-	private ArrayList<DrivingData> drivingRepport;
     private TransportService ts;
 	private DataInputStream entrada;
     private DataOutputStream saida;
 	
-	
+	// Classe Auto-> gera dados para company, indica ao driver para abastecer
+
 	public Auto(int contaDriver,String _idAuto, SumoColor _colorAuto, String _driverID, SumoTraciConnection _sumo, long _acquisitionRate,
 			int _fuelType, int _fuelPreferential, double _fuelPrice, int _personCapacity, int _personNumber) throws Exception {
 		this.contaDriver = contaDriver;
@@ -76,7 +76,6 @@ public class Auto extends Vehicle implements Runnable{
 		this.fuelPrice = _fuelPrice;
 		this.personCapacity = _personCapacity;
 		this.personNumber = _personNumber;
-		this.drivingRepport = new ArrayList<DrivingData>();
 
 		
 	}
@@ -84,21 +83,25 @@ public class Auto extends Vehicle implements Runnable{
 	@Override
 	public void run() {
 		System.out.println(this.idAuto + " on");
-        try {
-			Socket socket = new Socket("127.0.0.1",porta);
 
-            saida = new DataOutputStream(socket.getOutputStream());
+        try {
+			Socket socket = new Socket("127.0.0.1",porta); // conexão com a company
+
+            saida = new DataOutputStream(socket.getOutputStream()); 
             entrada = new DataInputStream(socket.getInputStream());
+
+			// cria instacia para atualizar o tanque e parar quando < 3L
 			atualizaTanque at  = new atualizaTanque(this, sumo); 
 			
 			at.start();
             while (!finalizado) { 
 				
+				// reinicia distancia percorrida
 				distanciaPercorrida = 0;
+				distancia = 0;
 				// envia seu estado para a company
 
 				obj.put("autoState", autoState);
-
 				String dados = obj.toString();
 				byte[] cripto = Criptografia.encrypt(dados);
 				saida.writeInt(cripto.length);
@@ -114,58 +117,60 @@ public class Auto extends Vehicle implements Runnable{
                 String recebe = Criptografia.decrypt(cripto);
 
 				try{
-					
+					// confere se as rotas foram finalizadas
 					JSONObject obj = new JSONObject(recebe);
-
                 	String str = obj.getString("RotasFinalizadas");
 
-				if(str.equals("true")){
-					this.finalizado = true;
-					this.autoState = "finalizado";
-					System.out.println("nao ha mais rotas");
-					obj.put("autoState", autoState);
-					dados = obj.toString();
-					cripto = Criptografia.encrypt(dados);
-			
-					saida.writeInt(cripto.length);
-					saida.write(cripto);
-
-					saida.close();
-					entrada.close();
-					socket.close();
+					if(str.equals("true")){
+						this.finalizado = true;
+						this.autoState = "finalizado";
+						System.out.println("nao ha mais rotas");
+						obj.put("autoState", autoState);
+						dados = obj.toString();
+						cripto = Criptografia.encrypt(dados);
 				
-					break;
-				}
+						saida.writeInt(cripto.length);
+						saida.write(cripto);
+
+						saida.close();
+						entrada.close();
+						socket.close();
+					
+						break;
+					}
 				}
 				 catch (Exception e)  {
 	
 				}
 
-				
+				// caso ainda exista rotas, ele recebe uma
                 route = string2Route(recebe);
 	
                 ts = new TransportService(this.idAuto,this,this.sumo,route);
                 ts.start();
-
+				// espera o TransportService adicionar o carro ao SUMO
 				synchronized(ts){
 					ts.join();
 				}
 
                 System.out.println(this.idAuto + " está com a rota " + route.getId());
+
                 String edgeFinal = this.getEdgeFinal(); 
                 this.on_off = true;
-
+				// Verifica se o carro esta no SUMO
+				// Dupla verificação pois os erros ocorrem quando o programa tenta acessar um carro e ele nao está no sumo ou está trocando de rota
 				SumoStringList lista = (SumoStringList)this.sumo.do_job_get(Vehicle.getIDList());
 				while(!lista.contains(this.idAuto)){
 					Thread.sleep(200);
 				}
 
+				// pega latitude e longitude iniciais
 				SumoPosition2D  posicaoInicial= (SumoPosition2D) sumo.do_job_get(Vehicle.getPosition(this.idAuto));
-
 				double [] latlong = converteGeo(posicaoInicial.x,posicaoInicial.y);
 				latinicial = latlong[0];
 				longinicial = latlong[1];
 				
+				// enquanto estiver na rota
                 while(this.on_off){
 
 					this.autoState = "executando";
@@ -182,14 +187,13 @@ public class Auto extends Vehicle implements Runnable{
 					atualizaSensores();
 					
                 }
+				this.Executadas.add(route);
 				this.autoState = "esperando";
 				// indica para a company que finalizou a rota
 				obj.put("autoState", "rotaFinalizada");
 				obj.put("routeId", this.route.getId());
 				String str = obj.toString();
-
 				cripto = Criptografia.encrypt(str);
-        
 				saida.writeInt(cripto.length);
 				saida.write(cripto);
 				
@@ -198,7 +202,7 @@ public class Auto extends Vehicle implements Runnable{
 
             }
 
-            
+            // espera o atualiza tanque finalizar
 			at.join();
 			System.out.println(this.idAuto + " off");
 
@@ -219,10 +223,9 @@ public class Auto extends Vehicle implements Runnable{
 			if (!this.getSumo().isClosed() ) {
 
 				this.autoState = "executando";
-
 				SumoPosition2D sumoPosition2D;
 				sumoPosition2D = (SumoPosition2D) sumo.do_job_get(Vehicle.getPosition(this.idAuto));
-
+				// pega as lat e long atuais e atualiza a distancia percorrida
 				double [] latlong = converteGeo(sumoPosition2D.x,sumoPosition2D.y);
 				latAtual = latlong[0];
 				longAtual = latlong[1];
@@ -234,9 +237,9 @@ public class Auto extends Vehicle implements Runnable{
 				DrivingData _repport = new DrivingData(this.bateu1km, this.autoState, this.contaDriver,
 						this.idAuto, this.driverID, timeStamp, sumoPosition2D.x, sumoPosition2D.y, latAtual, longAtual,
 						(String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto)),
-						(String) this.sumo.do_job_get(Vehicle.getRouteID(this.idAuto)),
+						route.getId(),
 						(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)),
-						(double) sumo.do_job_get(Vehicle.getDistance(this.idAuto)),
+						distancia,
 						(double) sumo.do_job_get(Vehicle.getFuelConsumption(this.idAuto)),
 						1/*averageFuelConsumption (calcular)*/,
 						this.fuelType, this.fuelPrice,
@@ -244,18 +247,15 @@ public class Auto extends Vehicle implements Runnable{
 						(double) sumo.do_job_get(Vehicle.getHCEmission(this.idAuto)),
 						this.personCapacity,
 						this.personNumber);
-
-				this.drivingRepport.add(_repport);				
+				
+				// Envia o DataDriving para a company
 				obj = JSON.drivingData2JSON(_repport);
-
 				String dados = obj.toString();
-
 				byte[] cripto = Criptografia.encrypt(dados);
-        
+
 				saida.writeInt(cripto.length);
 				saida.write(cripto);
 
-				//saida.writeUTF(dados);
 				this.bateu1km ="0";
 
 			} else {
@@ -267,21 +267,21 @@ public class Auto extends Vehicle implements Runnable{
 	}
 
 	
-
+	// transforma uma mensagem recebida em Rota
 	private Rota string2Route(String string)
 	{   
         JSONObject obj;
 
 		obj = new JSONObject(string);
-		String Id = (String) obj.get("IDRoute");
-		String rec = (String) obj.get("Edges");
+		String Id = obj.getString("IDRoute");
+		String rec = obj.getString("Edges");
 		Rota route = new Rota(Id, rec);
 
 		return route;
       
         
 	}
-
+	// similar ao que é feito na transport service, mas para pegar somente a edge final
     private String getEdgeFinal()
 	{
 		SumoStringList edge = new SumoStringList();
@@ -294,11 +294,13 @@ public class Auto extends Vehicle implements Runnable{
 		return edge.get(edge.size()-1);
 	}
 
-    private boolean rotaAcabou(String _edgeAtual, String _edgeFinal) throws Exception
+	// A rota finaliza quando a edge atual for igual a edge final, uma segunda verificação para ver se o carro 
+	// saiu da lista de carros em execução
+    private boolean rotaAcabou(String edgeAtual, String edgeFinal) throws Exception
 	{
 		SumoStringList lista = (SumoStringList) this.sumo.do_job_get(Vehicle.getIDList());
 		lista.contains(idAuto);
-		if(!lista.contains(idAuto) && (_edgeFinal.equals(_edgeAtual)))
+		if(!lista.contains(idAuto) && (edgeFinal.equals(edgeAtual)))
 		{
 			return true;
 		}
@@ -310,8 +312,8 @@ public class Auto extends Vehicle implements Runnable{
 
 	private double[] converteGeo(double x, double y)  {
 
-		double raioTerra = 6371000; // raio médio da Terra em metros
-
+		double raioTerra = 6371000; // raio da Terra
+		// referencia de X,Y = 0,0 no SUMO
 		double latRef = -22.986731;
 		double lonRef = -43.217054;
 
@@ -319,18 +321,18 @@ public class Auto extends Vehicle implements Runnable{
 		double lat = latRef + (y / raioTerra) * (180 / Math.PI);
 		double lon = lonRef + (x / raioTerra) * (180 / Math.PI) / Math.cos(latRef * Math.PI / 180);
 
-		double[] coordGeo = new double[] { lat, lon };
-		return coordGeo;
+		double[] latlong = new double[] { lat, lon };
+		return latlong;
 	}
 
-	private double calculaDistancia(double lat1, double lon1, double lat2, double lon2) {
+	private double calculaDeslocamento(double lat1, double lon1, double lat2, double lon2) {
 		double raioTerra = 6371000;
 	
 		// Diferenças das latitudes e longitudes
 		double diferancaLat = Math.toRadians(lat2 - lat1);
 		double diferancaLon = Math.toRadians(lon2 - lon1);
 	
-		// Fórmula de Haversine
+		// Fórmula de Haversine // https://forum.maparadar.com/viewtopic.php?t=5181
 		double a = Math.sin(diferancaLat / 2) * Math.sin(diferancaLat / 2) +
 				   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
 				   Math.sin(diferancaLon / 2) * Math.sin(diferancaLon / 2);
@@ -343,11 +345,11 @@ public class Auto extends Vehicle implements Runnable{
 
 	public void atualizaDistanciaPercorrida() {
 
-		double distancia = calculaDistancia(latinicial,longinicial,latAtual,longAtual);
+		distancia = calculaDeslocamento(latinicial,longinicial,latAtual,longAtual);
 
-		if (distancia > (distanciaPercorrida + 100)) {
+		if (distancia - distanciaPercorrida >= 1000) {
 			System.out.println("Fazer pagamento para " + this.idAuto);
-			distanciaPercorrida += 100;
+			distanciaPercorrida = distancia;
 			this.bateu1km = "bateu1km";
 		}
 	}
@@ -470,18 +472,12 @@ public class Auto extends Vehicle implements Runnable{
 	public int getPersonNumber() {
 		return this.personNumber;
 	}
-	public double getRelativo(){
-		return relativo;
-	}
+
 
 	public boolean getFinalizado(){
 		return finalizado;
 	}
 
-	public void setRelativo(double r){
-		this.relativo = r;
-
-	}
 
 	public double getFuelTank(){
 		return fuelTank;

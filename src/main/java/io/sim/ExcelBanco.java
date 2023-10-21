@@ -1,7 +1,7 @@
 package io.sim;
 
 public class ExcelBanco extends Thread{
-    
+    // thread que atualiza a planilha com os dados das transações
     Banco banco;
     public ExcelBanco(Banco banco){
         this.banco = banco;

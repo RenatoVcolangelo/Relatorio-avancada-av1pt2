@@ -21,11 +21,11 @@ public class Company extends Thread{
     private ServerSocket serverSocket;
     private Socket bancoSocket;
     public static ArrayList<DrivingData> reportData = new ArrayList<DrivingData>(0);
-    public ArrayList<ThreadCompany> threads = new ArrayList<ThreadCompany>();
+    public ArrayList<ThreadCompany> threads = new ArrayList<ThreadCompany>(); // conexões com os cars
 
     public Company(ArrayList<Rota> rotasNexe,int totalDrivers, int porta) throws IOException{
 
-        this.naoExecutadas = rotasNexe;
+        this.naoExecutadas = rotasNexe; // recebe um arraylist de rotas Itinerary i1.getRoutes()
         this.totalDrivers = totalDrivers;
         this.porta = porta;
 
@@ -101,7 +101,7 @@ public class Company extends Thread{
         return conta;
     }
 
-    // retorna uma rota de nExecutada e também a adc emExecucao
+    // remove uma rota de nExecutada a retorna e também a adc emExecucao
     public synchronized Rota getRoute(){
 
         Rota rota = naoExecutadas.remove(0);

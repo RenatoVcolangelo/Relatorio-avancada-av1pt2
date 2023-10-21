@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// Classe do banco Alpha, gerencia as conexões com os clientes e a lista de clientes 
+// salva as transações
 public class Banco extends Thread{
 
 	public static boolean ativo = true;
@@ -12,6 +14,7 @@ public class Banco extends Thread{
 	private int porta;
 	private ServerSocket serverSocket;
 	public static ArrayList<Transacao> transacoes = new ArrayList<Transacao>();
+	// Hashmap para conferir login e senha
 	private HashMap<String,String> cadastro = new HashMap<String,String>();
 	private ArrayList<ThreadBanco> threads = new ArrayList<ThreadBanco>();
 	
@@ -71,7 +74,7 @@ public class Banco extends Thread{
 	public boolean confereConta(String login, String senha){
 		return cadastro.get(login).equals(senha);
 	}
-	
+	// adiciona Transação ao relatorio
 	public static void addTransacao(Transacao transacao){
 		transacoes.add(transacao);
 	}
