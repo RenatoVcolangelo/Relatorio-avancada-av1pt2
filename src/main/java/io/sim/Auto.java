@@ -113,8 +113,6 @@ public class Auto extends Vehicle implements Runnable{
                 cripto = entrada.readNBytes(tam);
                 String recebe = Criptografia.decrypt(cripto);
 
-				//recebe = entrada.readUTF();
-
 				try{
 					
 					JSONObject obj = new JSONObject(recebe);
@@ -157,8 +155,8 @@ public class Auto extends Vehicle implements Runnable{
                 String edgeFinal = this.getEdgeFinal(); 
                 this.on_off = true;
 
-				SumoStringList a = (SumoStringList)this.sumo.do_job_get(Vehicle.getIDList());
-				while(!a.contains(this.idAuto)){
+				SumoStringList lista = (SumoStringList)this.sumo.do_job_get(Vehicle.getIDList());
+				while(!lista.contains(this.idAuto)){
 					Thread.sleep(200);
 				}
 
@@ -201,7 +199,7 @@ public class Auto extends Vehicle implements Runnable{
             }
 
             
-			//at.join();
+			at.join();
 			System.out.println(this.idAuto + " off");
 
 			} catch (InterruptedException e) {

@@ -3,7 +3,6 @@ package io.sim;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import org.json.JSONObject;
 
@@ -17,21 +16,16 @@ public class Driver extends Thread {
     private Auto auto;
     private Conta conta;
     private int id;
-
-
     private Socket socket;
     private DataOutputStream saida;
 
 
-    public Driver(Auto auto, int id) throws UnknownHostException, IOException{
+    public Driver(Auto auto, int id) throws IOException{
         this.id = id;
         this.auto = auto;
         this.conta = new Conta(100, id+1, "12345");
-
-
         this.socket = new Socket("127.0.0.1",22222);
-        
-        
+
     }
 
     @Override
@@ -45,18 +39,15 @@ public class Driver extends Thread {
 
             JSONObject obj = new JSONObject();
             obj.put("acabou","true");
-
             byte[] cripto = Criptografia.encrypt(obj.toString());
 			saida.writeInt(cripto.length);
 			saida.write(cripto);
-
             saida.close();
             socket.close();
 
             System.out.println("Driver " + this.id + " off");
 
         } catch (IOException e) {
-
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,8 +74,7 @@ public class Driver extends Thread {
                     BotPayment bot = new BotPayment(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,30);
                     bot.start();
                                   
-                    }
-                
+                }       
             }        
 
             } catch (InterruptedException e) {

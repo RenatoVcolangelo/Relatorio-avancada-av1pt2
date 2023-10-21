@@ -60,7 +60,7 @@ public class Company extends Thread{
                 
            }
            
-            
+            // espera as conexões fecharem
            for(ThreadCompany t:threads){
             t.join();
             }

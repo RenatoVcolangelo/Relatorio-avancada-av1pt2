@@ -12,9 +12,7 @@ public class TransportService extends Thread {
 	private Auto auto;
 	private Rota route;
 
-	public TransportService(String _idTransportService, Auto _auto,
-			SumoTraciConnection _sumo, Rota route) {
-
+	public TransportService(String _idTransportService, Auto _auto, SumoTraciConnection _sumo, Rota route) {
 
 		this.idTransportService = _idTransportService;
 		this.auto = _auto;
@@ -34,7 +32,7 @@ public class TransportService extends Thread {
                 } catch (InterruptedException e) {
                     
                     e.printStackTrace();
-                }	}					
+                }}					
 			
 	}
 
@@ -77,7 +75,6 @@ public class TransportService extends Thread {
 		}
 
 	}
-
 
 	public String getIdTransportService() {
 		return this.idTransportService;
