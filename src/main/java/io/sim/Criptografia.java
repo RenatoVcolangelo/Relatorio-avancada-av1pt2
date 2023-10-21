@@ -8,13 +8,7 @@ import javax.crypto.Cipher;
 public class Criptografia {
 
  private static String IV = "AAAAAAAAAAAAAAAA";
- private static String textopuro = "teste texto 12345678\0\0\0";
  private static String chaveencriptacao = "0123456789abcdef";
- private static int tamNumBytes = 32;
-
- public static int getTamNumBytes(){
-    return tamNumBytes;
- }
 
  public static byte[] encrypt(String textopuro) throws Exception {
    Cipher encripta = Cipher.getInstance("AES/CBC/PKCS5Padding", "SunJCE");

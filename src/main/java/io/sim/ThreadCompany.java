@@ -67,7 +67,6 @@ public class ThreadCompany extends Thread{
                         saida.writeInt(cripto.length);
                         saida.write(cripto);
 
-                        //saida.writeUTF(saidarotas.toString());
                         System.out.println("Rota enviada");}
 
                     else{
@@ -99,7 +98,7 @@ public class ThreadCompany extends Thread{
 
                     if(bateu1km.equals("bateu1km")){
 
-                        BotPay bot = new BotPay(saidaBanco,this.company.getConta().getId(), this.company.getConta().getLogin(), this.company.getConta().getSenha(), contaDriver,3.25);
+                        BotPayment bot = new BotPayment(saidaBanco,this.company.getConta().getId(), this.company.getConta().getLogin(), this.company.getConta().getSenha(), contaDriver,3.25);
                         bot.start();
                     }
                 }
@@ -112,9 +111,6 @@ public class ThreadCompany extends Thread{
 
 
             }
-
-            System.out.println("Thread company finalizada");
-
 
 
         } catch (IOException ioe) {

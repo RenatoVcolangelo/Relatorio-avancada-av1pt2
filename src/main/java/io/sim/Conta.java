@@ -1,6 +1,5 @@
 package io.sim;
 
-import org.python.modules.synchronize;
 
 public class Conta {
 	

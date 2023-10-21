@@ -7,6 +7,9 @@ public class atualizaTanque extends Thread{
     private Auto auto;
     private SumoTraciConnection sumo;
 
+    // Classe que atualiza o tanque de combustivel
+    // getFuelConsuption estava tirando muito, por isso padronizeie em 50ml/s
+
     public atualizaTanque(Auto auto, SumoTraciConnection sumo){
         this.auto = auto;
         this.sumo = sumo;
@@ -16,43 +19,46 @@ public class atualizaTanque extends Thread{
     @Override
     public void run(){
        
-        confereTanque();
-
-        
+        confereTanque();       
     }
 
     private void confereTanque(){
 
         while(!this.auto.getFinalizado()){
-          
+            
             try {           
-                
+                Thread.sleep(200);
                 while(this.auto.isOn_off()){
+
+                    System.out.print("");
+                    // Caso nao precise abastecer, seta a vel e modo
                     if(!this.auto.getAbastecer()){
                         sumo.do_job_set(Vehicle.setSpeed(this.auto.getIdAuto(), 15));
-                        sumo.do_job_set(Vehicle.setSpeedMode(this.auto.getIdAuto(), 31));}
+                        sumo.do_job_set(Vehicle.setSpeedMode(this.auto.getIdAuto(), 31));
+                    }
 
                     while(!this.auto.getAbastecer() && this.auto.isOn_off()){
 
-                        this.auto.setFuelTank(-30);
+                        this.auto.setFuelTank(-50);
+                        // se menor que 3000 o carro para e espera abastecer
                         if(this.auto.getFuelTank() < 3000){
+
                             this.auto.setAbastecer(true);
                             sumo.do_job_set(Vehicle.setSpeed(this.auto.getIdAuto(), 0));
                             
                         }                    
-                        Thread.sleep(1000);
+                        Thread.sleep(1000); // a cada um segundo retira 50ml
                         } 
-            }
-        }
+                    }
+                }
             
             catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-
+                e.printStackTrace();
+                    } 
+            catch (Exception e) {
                 e.printStackTrace();
             }}
-    
-        
+      
    }
     
 }

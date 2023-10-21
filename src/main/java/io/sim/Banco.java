@@ -7,15 +7,15 @@ import java.util.HashMap;
 
 public class Banco extends Thread{
 
-	private static ArrayList<Transacao> transacoes = new ArrayList<Transacao>();
-	private HashMap<String,String> cadastro = new HashMap<String,String>();
 	public static boolean ativo = true;
 	private ArrayList<Conta> listaContas;
 	private int porta;
 	private ServerSocket serverSocket;
-	private boolean on_ff = true;
-	public ArrayList<ThreadBanco> threads = new ArrayList<ThreadBanco>();
-
+	public static ArrayList<Transacao> transacoes = new ArrayList<Transacao>();
+	private HashMap<String,String> cadastro = new HashMap<String,String>();
+	private ArrayList<ThreadBanco> threads = new ArrayList<ThreadBanco>();
+	
+	// Classe banco cria conexões com clientes e armazena as transações
 	public Banco(int porta) throws IOException{
 		this.porta = porta;
 		listaContas = new ArrayList<Conta>();
@@ -26,7 +26,12 @@ public class Banco extends Thread{
 
 	public void run(){
 		try {
-			for(int i = 0; i < EnvSimulator.totalDrivers+2; i++) {
+			// cria relatório das transações
+			Relatorio.criaExcelTransacao();
+			ExcelBanco excelBanco = new ExcelBanco(this);
+			excelBanco.start();
+
+			for(int i = 0; i < EnvSimulator.totalDrivers+2; i++) { // +2 pois company e fuel station
 				
 					Socket clienteSocket = serverSocket.accept(); // Espera por uma conexão
 
@@ -34,15 +39,23 @@ public class Banco extends Thread{
 					threads.add(thread);		
 					thread.start(); 
 			}
+			
+			// espera conexões fecharem
+			for(ThreadBanco t: threads){
+				t.join();
+			}
 
+			ativo = false;
+			excelBanco.join();
 
-			System.out.println("Banco off");
+			System.out.println("BANCO OFF");
+
 		} catch (IOException e) {
 
-			e.printStackTrace();}
-		// } catch (InterruptedException e) {
-		// 	e.printStackTrace();
-		// } 
+			e.printStackTrace();} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 			    
 	}
 
@@ -62,7 +75,6 @@ public class Banco extends Thread{
 	public static void addTransacao(Transacao transacao){
 		transacoes.add(transacao);
 	}
-
 
 
 }

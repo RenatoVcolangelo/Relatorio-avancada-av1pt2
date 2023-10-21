@@ -1,6 +1,5 @@
 package io.sim;
 
-import java.security.Timestamp;
 
 public class DrivingData {
 

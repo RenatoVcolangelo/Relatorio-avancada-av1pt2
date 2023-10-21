@@ -4,7 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 
-public class BotPay extends Thread{
+public class BotPayment extends Thread{
     
     private double valor;
     private int conta_paga;
@@ -13,7 +13,8 @@ public class BotPay extends Thread{
     private String login;
     private String senha;
 
-    public BotPay(DataOutputStream saida, int conta_paga, String login, String senha, int conta_recebe,  double valor){
+    // Classe que reune dados de transação e as envia para o servidor do banco
+    public BotPayment(DataOutputStream saida, int conta_paga, String login, String senha, int conta_recebe,  double valor){
 
         this.valor = valor;
         this.saida = saida;
@@ -27,19 +28,16 @@ public class BotPay extends Thread{
     public void run(){
       try {
         
-
         String dadosTransacao = JSON.dadosTrasacao2JSON(login, senha, conta_paga, conta_recebe, valor);
         
         byte[] cripto = Criptografia.encrypt(dadosTransacao);
         
         saida.writeInt(cripto.length);
         saida.write(cripto);
-      
-        //saida.writeUTF(dadosTransacao);
+
       } catch (IOException e) {
           e.printStackTrace();
       } catch (Exception e) {
-
         e.printStackTrace();
     }
  

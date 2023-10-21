@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import org.json.JSONObject;
 
-import it.polito.appeal.traci.SumoTraciConnection;
+//Classe da Mobility Company responsável por criar conexao com os carros e o banco
 
 public class Company extends Thread{
 
@@ -17,93 +16,82 @@ public class Company extends Thread{
     private ArrayList<Rota> emExecucao;
     private ArrayList<Rota> Executadas;
     private Conta conta;
-    private SumoTraciConnection sumo;
-    private boolean on_off;
     private int totalDrivers;
-    private int porta = 55555;
+    private int porta;
     private ServerSocket serverSocket;
     private Socket bancoSocket;
     public static ArrayList<DrivingData> reportData = new ArrayList<DrivingData>(0);
     public ArrayList<ThreadCompany> threads = new ArrayList<ThreadCompany>();
-    private static String fileName = "Relatorio1.xlsx";
 
-   
-
-    public Company(ArrayList<Rota> rotasNexe,SumoTraciConnection sumo, int totalDrivers) throws IOException{
+    public Company(ArrayList<Rota> rotasNexe,int totalDrivers, int porta) throws IOException{
 
         this.naoExecutadas = rotasNexe;
-        this.sumo = sumo;
-        this.on_off = true;
         this.totalDrivers = totalDrivers;
+        this.porta = porta;
 
         emExecucao = new ArrayList<Rota>();
         Executadas = new ArrayList<Rota>();
         conta = new Conta(500000,0,"12345");
 
-        this.serverSocket = new ServerSocket(porta); // Porta do servidor
-        
-        
-       
+        this.serverSocket = new ServerSocket(porta);  // Porta do servidor
+              
     }
 
     @Override
     public void run(){
-        System.out.println("Servidor Company criado");
-           
-        try {
-            this.bancoSocket = new Socket("127.0.0.1",22222); // Conexao com o banco
-            for(int i = 0; i < totalDrivers;i++){
 
-                Socket  socketCarro = serverSocket.accept(); // Espera por uma conexão
+        System.out.println("Servidor Company criado");
+        // Faz o relatorio em tempo real dos dados dos carros
+        Relatorio.criaExcelAuto();
+        ExcelCompany excel = new ExcelCompany(this);
+        excel.start();
+   
+        try {
+
+            this.bancoSocket = new Socket("127.0.0.1",22222); // Conexao com o banco
+
+            for(int i = 0; i < totalDrivers; i++){
+
+                Socket  socketCarro = serverSocket.accept(); // Espera por uma conexão com auto
         
                 ThreadCompany thread = new ThreadCompany(socketCarro, bancoSocket, this);
                 threads.add(thread);
                 thread.start();
-
                 
            }
-
            
             
            for(ThreadCompany t:threads){
             t.join();
+            }
             
+            // Informa a thread de conexão do banco para fechar JSON/Criptografia
+            DataOutputStream saida = new DataOutputStream(bancoSocket.getOutputStream());
             JSONObject obj = new JSONObject();
             obj.put("acabou","true");
-
-            DataOutputStream saida = new DataOutputStream(bancoSocket.getOutputStream());
-
             byte[] cripto = Criptografia.encrypt(obj.toString());
 			saida.writeInt(cripto.length);
 			saida.write(cripto);
-        }
-
-        this.serverSocket.close();
         
-        } catch (IOException e) {
 
+            this.serverSocket.close();
+        
+            ativo = false; 
+            excel.join();
+        
+            System.out.println("COMPANY OFF");
+
+         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
-
             e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        
-
-        System.out.println("Company off");
-
-        // Relatorio re = new Relatorio(reportData);
-        // re.start();
-        ativo = false;
+             
 
     }
 
-    public static synchronized String getFilename(){
-        return fileName;
-    }
 
     public synchronized void addRelatorio(DrivingData d){
         reportData.add(d);
@@ -113,6 +101,7 @@ public class Company extends Thread{
         return conta;
     }
 
+    // retorna uma rota de nExecutada e também a adc emExecucao
     public synchronized Rota getRoute(){
 
         Rota rota = naoExecutadas.remove(0);
@@ -120,6 +109,7 @@ public class Company extends Thread{
         return rota;
     }
 
+    // quando auto finaliza uma rota, manda o id da route e ela é movida para Executadas
     public synchronized void routeExecutada(String i){
         for(Rota rota: emExecucao){
             if(rota.getId().equals(i)){
@@ -131,10 +121,6 @@ public class Company extends Thread{
         
     }
 
-     public  Rota getRota(int i){
-        return naoExecutadas.get(i);
-    }
-
     public ArrayList<Rota> getRoutesNExe(){
         return naoExecutadas;
     }
@@ -142,9 +128,7 @@ public class Company extends Thread{
     public ArrayList<Rota> getRoutesExe(){
         return emExecucao;
     }
-    public static boolean getAtivo(){
-        return ativo;
-    }
+
 
 
 

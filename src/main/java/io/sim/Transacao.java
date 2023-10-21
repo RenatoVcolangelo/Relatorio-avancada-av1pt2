@@ -28,8 +28,8 @@ public class Transacao {
         return valor;
     }
 
-    public Timestamp getTimestamp(){
-        return timestamp1;
+    public String getTimestamp(){
+        return timestamp1.toString();
     }
 
 }

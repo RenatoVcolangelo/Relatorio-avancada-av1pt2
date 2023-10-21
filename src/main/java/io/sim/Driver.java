@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
 import org.json.JSONObject;
 
-import it.polito.appeal.traci.SumoTraciConnection;
+
 
 public class Driver extends Thread {
     
@@ -18,17 +17,17 @@ public class Driver extends Thread {
     private Auto auto;
     private Conta conta;
     private int id;
-    private SumoTraciConnection sumo;
+
 
     private Socket socket;
     private DataOutputStream saida;
 
 
-    public Driver(Auto auto, int id, SumoTraciConnection sumo) throws UnknownHostException, IOException{
+    public Driver(Auto auto, int id) throws UnknownHostException, IOException{
         this.id = id;
         this.auto = auto;
         this.conta = new Conta(100, id+1, "12345");
-        this.sumo = sumo;
+
 
         this.socket = new Socket("127.0.0.1",22222);
         
@@ -81,7 +80,7 @@ public class Driver extends Thread {
                     // fuelStation.abastecerCarro(this.auto, 1000* this.conta.getSaldo()/5.87);
                     FuelStation.abastecerCarro(this.auto, 5000);
                                        
-                    BotPay bot = new BotPay(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,30);
+                    BotPayment bot = new BotPayment(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,30);
                     bot.start();
                                   
                     }

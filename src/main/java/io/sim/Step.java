@@ -15,7 +15,7 @@ public class Step extends Thread {
                         Thread.sleep(50);
                         this.sumo.do_timestep();
                     } catch (Exception e) {
-                        //e.printStackTrace();
+
                         break;
                     }
             }

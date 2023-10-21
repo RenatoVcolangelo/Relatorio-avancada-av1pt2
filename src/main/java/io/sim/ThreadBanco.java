@@ -60,8 +60,6 @@ public class ThreadBanco extends Thread{
                 
         }
 
-
-        System.out.println("Thread banco off");
            
         } catch (IOException ioe) {
             System.out.println("Erro:2 " + ioe.toString());

@@ -13,9 +13,9 @@ import org.json.JSONObject;
 public class FuelStation extends Thread{
 
     private static final int MAX_CARROS = 2;
-    private DataOutputStream saida;
     private Socket socket;
     private static Semaphore semaforo = new Semaphore(MAX_CARROS);
+    private DataOutputStream saida;
     private Conta conta;
 
 
@@ -43,10 +43,13 @@ public class FuelStation extends Thread{
                  byte[] cripto = Criptografia.encrypt(obj.toString());
                 saida.writeInt(cripto.length);
                 saida.write(cripto);
+
+                socket.close();
+                
             } catch (Exception e){
 
             }
-
+            
 		System.out.println("Posto off");	
 
     }

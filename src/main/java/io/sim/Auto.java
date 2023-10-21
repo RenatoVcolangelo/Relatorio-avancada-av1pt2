@@ -50,7 +50,7 @@ public class Auto extends Vehicle implements Runnable{
     private TransportService ts;
 	private DataInputStream entrada;
     private DataOutputStream saida;
-	private String recebe;
+	
 	
 	public Auto(int contaDriver,String _idAuto, SumoColor _colorAuto, String _driverID, SumoTraciConnection _sumo, long _acquisitionRate,
 			int _fuelType, int _fuelPreferential, double _fuelPrice, int _personCapacity, int _personNumber) throws Exception {
@@ -91,8 +91,7 @@ public class Auto extends Vehicle implements Runnable{
             entrada = new DataInputStream(socket.getInputStream());
 			atualizaTanque at  = new atualizaTanque(this, sumo); 
 			
-			//at.start();
-
+			at.start();
             while (!finalizado) { 
 				
 				distanciaPercorrida = 0;
@@ -185,6 +184,7 @@ public class Auto extends Vehicle implements Runnable{
 					atualizaSensores();
 					
                 }
+				this.autoState = "esperando";
 				// indica para a company que finalizou a rota
 				obj.put("autoState", "rotaFinalizada");
 				obj.put("routeId", this.route.getId());
@@ -195,27 +195,22 @@ public class Auto extends Vehicle implements Runnable{
 				saida.writeInt(cripto.length);
 				saida.write(cripto);
 				
-				//saida.writeUTF(str);
 
 				System.out.println(this.idAuto + " esperando nova rota");
 
-				if(finalizado){	
-					at.join(); // finaliza a atualização do
-					this.autoState = "finalizado";
-				}
-				else{
-					this.autoState = "esperando";
-				}
             }
 
-            } catch (InterruptedException e) {
+            
+			//at.join();
+			System.out.println(this.idAuto + " off");
+
+			} catch (InterruptedException e) {
 				this.on_off = false;
                 e.printStackTrace();
             } catch (Exception e) {
 				this.on_off = false;
                 e.printStackTrace();
             }
-			System.out.println(this.idAuto + " off");
 		
 	}
 
