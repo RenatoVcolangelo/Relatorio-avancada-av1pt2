@@ -44,6 +44,7 @@ public class atualizaTanque extends Thread{
                         if(this.auto.getFuelTank() < 3000){
 
                             this.auto.setAbastecer(true);
+                            System.out.println(this.auto.getIdAuto() + " parou para abastecer");
                             sumo.do_job_set(Vehicle.setSpeed(this.auto.getIdAuto(), 0));
                             
                         }                    

@@ -6,6 +6,7 @@ public class Rota {
     private String edge;
 
     // Classe que instancia uma route, possui Id e um conjunto de edges
+    
     public Rota(String id, String edge){
         this.idRoute = id;
         this.edge = edge;

@@ -29,10 +29,11 @@ public class FuelStation extends Thread{
 
         try {
             this.socket = new Socket("127.0.0.1",22222); // conexão com o banco
+            this.conta = new Conta(10000, 1, "12345");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.conta = new Conta(10000, 1, "12345");
+        
         System.out.println("Posto on");
             
             // Envia mensagem indicando para fechar a conexão
@@ -42,7 +43,7 @@ public class FuelStation extends Thread{
             DataOutputStream saida;
             try{
                 saida = new DataOutputStream(socket.getOutputStream());
-                 byte[] cripto = Criptografia.encrypt(obj.toString());
+                byte[] cripto = Criptografia.encrypt(obj.toString());
                 saida.writeInt(cripto.length);
                 saida.write(cripto);
 

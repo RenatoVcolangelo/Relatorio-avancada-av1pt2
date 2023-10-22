@@ -68,10 +68,9 @@ public class Driver extends Thread {
             
                 if(this.auto.getAbastecer()){ 
                     
-                    FuelStation.abastecerCarro(this.auto, 1000* this.conta.getSaldo()/this.auto.getFuelPrice());
-                    // FuelStation.abastecerCarro(this.auto, 5000);
+                    FuelStation.abastecerCarro(this.auto, 7000);
                                        
-                    BotPayment bot = new BotPayment(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,this.conta.getSaldo());
+                    BotPayment bot = new BotPayment(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,7*this.auto.getFuelPrice());
                     bot.start();
                                   
                 }       

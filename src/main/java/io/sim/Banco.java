@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// Classe do banco Alpha, gerencia as conexões com os clientes e a lista de clientes 
+// Classe do banco Alpha, servidor que gerencia as conexões com os clientes e a lista de clientes 
 // salva as transações
 public class Banco extends Thread{
 

@@ -18,12 +18,11 @@ public class Auto extends Vehicle implements Runnable{
 	private SumoColor colorAuto;
 	private String driverID;
 	private SumoTraciConnection sumo;
-	private double fuelTank = 3500; //ml
+	private double fuelTank = 10000; //ml
 	private atualizaTanque at;
 	private boolean abastecer = false;
 	private Rota route;
 	private JSONObject obj = new JSONObject();
-	private boolean emrota;
 	private boolean finalizado = false;
 	private String autoState = "esperando";
 	private String bateu1km = "0";
@@ -236,7 +235,7 @@ public class Auto extends Vehicle implements Runnable{
 
 				DrivingData _repport = new DrivingData(this.bateu1km, this.autoState, this.contaDriver,
 						this.idAuto, this.driverID, timeStamp, sumoPosition2D.x, sumoPosition2D.y, latAtual, longAtual,
-						(String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto)),
+						route.getId(),
 						route.getId(),
 						(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)),
 						distancia,
@@ -393,13 +392,6 @@ public class Auto extends Vehicle implements Runnable{
 		this.on_off = _on_off;
 	}
 
-	public void setEmRota(boolean a) {
-		this.emrota = a;
-	}
-
-	public boolean getEmRota() {
-		return this.emrota;
-	}
 
 	public void setAbastecer(boolean a){
 		this.abastecer = a;

@@ -12,7 +12,7 @@ public class EnvSimulator extends Thread{
 	private Company company;
 	private Banco alpha;
 	private FuelStation fuelStation;
-	public static int totalDrivers = 4;
+	public static int totalDrivers = 100;
 	
 
     public EnvSimulator(){
@@ -37,7 +37,7 @@ public class EnvSimulator extends Thread{
 			System.out.println("sumo on");
 
 			// Pega as rotas 
-			Itinerary i1= new Itinerary("data/dados2.xml", "0");
+			Itinerary i1= new Itinerary("data/dados.xml", "0");
 
 			// Cria o banco
 			this.alpha = new Banco(22222);
@@ -75,14 +75,14 @@ public class EnvSimulator extends Thread{
 
 				// i + 1 pois as contas dos drivers começa em 2
 
-				Auto a1 = new Auto(i+1, "Car " + Integer.toString(i), green,"D"+ i, sumo, 200, fuelType, fuelPreferential, fuelPrice, personCapacity, personNumber);
+				Auto a1 = new Auto(i+1, "Car " + Integer.toString(i), green,"D"+ i, sumo, 100, fuelType, fuelPreferential, fuelPrice, personCapacity, personNumber);
 
 				Driver d = new Driver(a1,i);
 				drivers.add(d);
 
 				this.alpha.addConta(i+1,d.getConta());
 				d.start();
-				Thread.sleep(500);			
+				Thread.sleep(200);			
 			}
 
 		// aguarda o fim das Threads
