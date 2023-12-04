@@ -39,11 +39,17 @@ public class Company extends Thread{
 
     @Override
     public void run(){
+        // long t0 = System.nanoTime();
+       	// System.out.println("Fila company = " + t0);
 
         System.out.println("Servidor Company criado");
         // Faz o relatorio em tempo real dos dados dos carros
         Relatorio.criaExcelAuto();
+        
+       	
         ExcelCompany excel = new ExcelCompany(this);
+        // long t0 = System.nanoTime();
+        // System.out.println("start excel = " + t0);
         excel.start();
    
         try {
@@ -56,10 +62,13 @@ public class Company extends Thread{
         
                 ThreadCompany thread = new ThreadCompany(socketCarro, bancoSocket, this);
                 threads.add(thread);
+                // long t0 = System.nanoTime();
+                // System.out.println("start thread" + i + " = " + t0);
                 thread.start();
                 
            }
-           
+        //    long t1 = System.nanoTime();
+        //     System.out.println("fim company = " + t1);
             // espera as conexões fecharem
            for(ThreadCompany t:threads){
             t.join();
@@ -80,6 +89,7 @@ public class Company extends Thread{
             excel.join();
         
             System.out.println("COMPANY OFF");
+            
 
          } catch (IOException e) {
             e.printStackTrace();
@@ -105,6 +115,7 @@ public class Company extends Thread{
     public synchronized Rota getRoute(){
 
         Rota rota = naoExecutadas.remove(0);
+       // Rota rota = naoExecutadas.get(0);
         emExecucao.add(rota);
         return rota;
     }

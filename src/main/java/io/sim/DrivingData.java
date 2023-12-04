@@ -29,12 +29,14 @@ public class DrivingData {
 	private int personNumber;			// the total number of persons which are riding in this vehicle
 	private double co2Emission; 		// in mg/s for the last time step
 	private double HCEmission; 			// in mg/s for the last time step
+	private double distance;
+	private double edgeDist;
 
 	public DrivingData( 
 
 			String bateu1km, String autoState, int contaDriver, String _autoID, String _driverID, String  _timeStamp, double _x_Position, double _y_Position, double _lati, double _long,
 			String _roadIDSUMO, String _routeIDSUMO, double _speed, double _odometer, double _fuelConsumption,
-			double _averageFuelConsumption, int _fuelType, double _fuelPrice, double _co2Emission, double _HCEmission, int _personCapacity, int _personNumber) 
+			double _averageFuelConsumption, int _fuelType, double _fuelPrice, double _co2Emission, double _HCEmission, int _personCapacity, int _personNumber, double distance, double edgeDist) 
 		{
 		
 		this.bateu1km = bateu1km;
@@ -59,7 +61,15 @@ public class DrivingData {
 		this.HCEmission = _HCEmission;
 		this.personCapacity = _personCapacity;
 		this.personNumber = _personNumber;
+		this.distance = distance;
+		this.edgeDist = edgeDist;
 
+	}
+	public double getEdgeDist(){
+		return edgeDist;
+	}
+	public double getDistance(){
+		return distance;
 	}
 
 	public double getLatitude() {

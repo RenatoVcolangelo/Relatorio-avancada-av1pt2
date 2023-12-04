@@ -18,6 +18,8 @@ public class atualizaTanque extends Thread{
 
     @Override
     public void run(){
+        // long t0 = System.nanoTime();
+        // System.out.println("run tanque = " + t0);
        
         confereTanque();       
     }
@@ -27,7 +29,7 @@ public class atualizaTanque extends Thread{
         while(!this.auto.getFinalizado()){
             
             try {           
-                Thread.sleep(200);
+                Thread.sleep(2000);
                 while(this.auto.isOn_off()){
 
                     System.out.print("");
@@ -49,6 +51,8 @@ public class atualizaTanque extends Thread{
                             
                         }                    
                         Thread.sleep(1000); // a cada um segundo retira 50ml
+                        // long t0 = System.nanoTime();
+                        // System.out.println("fim tanque = " + t0);
                         } 
                     }
                 }

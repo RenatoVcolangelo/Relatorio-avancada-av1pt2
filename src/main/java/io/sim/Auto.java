@@ -81,6 +81,10 @@ public class Auto extends Vehicle implements Runnable{
 
 	@Override
 	public void run() {
+
+		// long t00 = System.nanoTime();
+        // System.out.println("run auto = " + t00);
+		Relatorio.criaExcelReconciliacao();
 		System.out.println(this.idAuto + " on");
 
         try {
@@ -91,8 +95,9 @@ public class Auto extends Vehicle implements Runnable{
 
 			// cria instacia para atualizar o tanque e parar quando < 3L
 			atualizaTanque at  = new atualizaTanque(this, sumo); 
-			
-			at.start();
+			// long ta = System.nanoTime();
+            // System.out.println("start tanque = " + ta);
+			//at.start();
             while (!finalizado) { 
 				
 				// reinicia distancia percorrida
@@ -144,9 +149,13 @@ public class Auto extends Vehicle implements Runnable{
 
 				// caso ainda exista rotas, ele recebe uma
                 route = string2Route(recebe);
+
 	
                 ts = new TransportService(this.idAuto,this,this.sumo,route);
+				// long to = System.nanoTime();
+            	// System.out.println("start ts = " + to);
                 ts.start();
+				ts.setPriority(10);
 				// espera o TransportService adicionar o carro ao SUMO
 				synchronized(ts){
 					ts.join();
@@ -168,24 +177,102 @@ public class Auto extends Vehicle implements Runnable{
 				double [] latlong = converteGeo(posicaoInicial.x,posicaoInicial.y);
 				latinicial = latlong[0];
 				longinicial = latlong[1];
+
+				// Arraylists para guardar os tempos e distancias parciais, as edges de monitoramento 
+				// e definir as velocidades médias
+
+				ArrayList<Double> tempos = new ArrayList<Double>();
+				ArrayList<Double> distancias = new ArrayList<Double>();
+    			ArrayList<String> edges = new ArrayList<String>();
+				ArrayList<Double> velmed = new ArrayList<Double>();
 				
-				// enquanto estiver na rota
+				edges.add("72145316#5");
+				edges.add("30149869#3");
+				edges.add("30149869#5");
+				edges.add("30149869#6");
+
+				velmed.add(8.25);
+				velmed.add(8.25);
+				velmed.add(7.85);
+				velmed.add(7.322);				
+				velmed.add(7.65);
+				
+				// marca o tempo 0
+				long t0= System.currentTimeMillis();
+				long tantigo = t0;
+				int i = 1;
+				double parcial = 0;
+				double disantiga=0;
+				double difDist = 0;
+
+				// Seta a primeira velocidade parcial
+				sumo.do_job_set(Vehicle.setSpeed(this.idAuto, velmed.remove(0)));
+            	sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
+
                 while(this.on_off){
 
 					this.autoState = "executando";
 					String edgeAtual = (String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto));
+					
+					//Quando acontece troca de edge para uma de monitoramento, é realizada a medição
+					// de tempo e distancia
+
+					if(!edges.isEmpty()){          
+						if(edgeAtual.equals(edges.get(0))){
+
+							// seta velocidade parcial
+							sumo.do_job_set(Vehicle.setSpeed(this.idAuto, velmed.remove(0)));
+            				sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
+
+							edges.remove(0);
+							long ti = System.currentTimeMillis();
+							parcial = (ti-tantigo);
+							parcial = parcial/1000;
+							tantigo = ti;
+							System.out.println("parcial t" +i + " " + parcial);
+							i++;
+							difDist = distancia - disantiga;
+							System.out.println("dist" + i+ " " + difDist);
+							distancias.add(difDist);
+							disantiga = distancia;
+							tempos.add(parcial);
+						}
+					}
                     Thread.sleep(this.acquisitionRate);
+					
 					
 					// testa se a rota ja acabou
 					if(rotaAcabou(edgeAtual, edgeFinal))
 					{
-						System.out.println(this.idAuto + " acabou a rota.");
 						this.on_off = false;
 						break;
 					}
-					atualizaSensores();
-					
+
+						atualizaSensores();
+						// long t11 = System.nanoTime();
+						// System.out.println("fim car = " + t11);
                 }
+
+				// pega o ultimo tempo parcial e total, assim como distancia 
+				long t1= System.currentTimeMillis();
+				parcial = t1- tantigo;
+				parcial = parcial/1000;
+				tempos.add(parcial);
+				difDist = distancia - disantiga;
+				distancias.add(difDist);
+				System.out.println("parcial t" +i + " " + parcial);
+				System.out.println("Dist" +i + " " + difDist);
+				double total = t1 - t0;
+				total = total/1000;
+				tempos.add(total);
+				distancias.add(distancia);
+				System.out.println("Total = " + total);
+				System.out.println("Dist Total = " + distancia); 
+				// escreve no relatorio
+				Relatorio.manipulaExcelRec(tempos, distancias);
+
+				System.out.println(this.idAuto + " acabou a rota.");
+
 				this.Executadas.add(route);
 				this.autoState = "esperando";
 				// indica para a company que finalizou a rota
@@ -198,6 +285,7 @@ public class Auto extends Vehicle implements Runnable{
 				
 
 				System.out.println(this.idAuto + " esperando nova rota");
+				
 
             }
 
@@ -229,23 +317,27 @@ public class Auto extends Vehicle implements Runnable{
 				latAtual = latlong[0];
 				longAtual = latlong[1];
 				atualizaDistanciaPercorrida();
+				latinicial = latAtual;
+				longinicial = longAtual;
 
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				String timeStamp = timestamp.toString();
 
 				DrivingData _repport = new DrivingData(this.bateu1km, this.autoState, this.contaDriver,
 						this.idAuto, this.driverID, timeStamp, sumoPosition2D.x, sumoPosition2D.y, latAtual, longAtual,
-						route.getId(),
+						(String) sumo.do_job_get(Vehicle.getRoadID(this.idAuto)),
 						route.getId(),
 						(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)),
-						distancia,
+						(double) sumo.do_job_get(Vehicle.getDistance(this.idAuto)),
 						(double) sumo.do_job_get(Vehicle.getFuelConsumption(this.idAuto)),
 						1/*averageFuelConsumption (calcular)*/,
 						this.fuelType, this.fuelPrice,
 						(double) sumo.do_job_get(Vehicle.getCO2Emission(this.idAuto)),
 						(double) sumo.do_job_get(Vehicle.getHCEmission(this.idAuto)),
 						this.personCapacity,
-						this.personNumber);
+						this.personNumber,
+						this.distancia,
+						(double) sumo.do_job_get(Vehicle.getLanePosition(this.idAuto)));
 				
 				// Envia o DataDriving para a company
 				obj = JSON.drivingData2JSON(_repport);
@@ -279,6 +371,10 @@ public class Auto extends Vehicle implements Runnable{
 		return route;
       
         
+	}
+
+	public double getDistacia(){
+		return distancia;
 	}
 	// similar ao que é feito na transport service, mas para pegar somente a edge final
     private String getEdgeFinal()
@@ -344,7 +440,7 @@ public class Auto extends Vehicle implements Runnable{
 
 	public void atualizaDistanciaPercorrida() {
 
-		distancia = calculaDeslocamento(latinicial,longinicial,latAtual,longAtual);
+		distancia = distancia + calculaDeslocamento(latinicial,longinicial,latAtual,longAtual);
 
 		if (distancia - distanciaPercorrida >= 1000) {
 			System.out.println("Fazer pagamento para " + this.idAuto);

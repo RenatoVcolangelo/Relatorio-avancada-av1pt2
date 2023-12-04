@@ -25,6 +25,8 @@ public class TransportService extends Thread {
 
 	@Override
 	public void run() {
+		// long t0 = System.nanoTime();
+        //  System.out.println("run ts = " + t0);
 
             synchronized(this){
                 try {
@@ -35,7 +37,8 @@ public class TransportService extends Thread {
                     
                     e.printStackTrace();
                 }}					
-			
+				// long t1 = System.nanoTime();
+				// System.out.println("fim ts = " + t1);	
 	}
 
 	private void initializeRoutes() {

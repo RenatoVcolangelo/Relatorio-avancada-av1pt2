@@ -47,6 +47,8 @@ public class JSON {
 		obj.put("HCEmission",_DrivingData.getHCEmission());
 		obj.put("PersonCapacity",_DrivingData.getPersonCapacity());
 		obj.put("PersonNumber",_DrivingData.getPersonNumber());
+        obj.put("Distance",_DrivingData.getDistance());
+        obj.put("edgeDistance",_DrivingData.getEdgeDist());
 
         return obj;
 	}
@@ -78,7 +80,9 @@ public class JSON {
         double HCEmission = obj.getDouble("HCEmission");
         int PersonCapacity = obj.getInt("PersonCapacity");
         int PersonNumber = obj.getInt("PersonNumber");
+        double distance = obj.getDouble("Distance");
+        double edgedistance = obj.getDouble("edgeDistance");
 
-        DrivingData carRepport = new DrivingData(bateu1km,autoState,contaDriver, AutoID, DriverID, TimeStamp,X_Position, Y_Position,latitude,longitude, RoadIDSUMO,  RouteIDSUMO, Speed, Odometer, FuelConsumption, AverageFuelConsumption, FuelType, FuelPrice, Co2Emission, HCEmission, PersonCapacity, PersonNumber);
+        DrivingData carRepport = new DrivingData(bateu1km,autoState,contaDriver, AutoID, DriverID, TimeStamp,X_Position, Y_Position,latitude,longitude, RoadIDSUMO,  RouteIDSUMO, Speed, Odometer, FuelConsumption, AverageFuelConsumption, FuelType, FuelPrice, Co2Emission, HCEmission, PersonCapacity, PersonNumber, distance,edgedistance);
 
 	return carRepport;}}

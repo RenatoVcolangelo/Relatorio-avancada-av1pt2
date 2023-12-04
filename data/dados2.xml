@@ -1,43 +1,11 @@
 <raiz>
-    <!-- <vehicle id="3" depart="1.00">
-        <route edges="-72157016 15469624#7"/>
-    </vehicle> -->
-    <!-- <vehicle id="0" depart="0.00">
-        <route edges="341671964#3 341671964#4 341671964#5"/>
-    </vehicle>
-    <vehicle id="1" depart="1.00">
-        <route edges="15469696#4 15240255#3 15240255#4"/>
-    </vehicle>
-    <vehicle id="3" depart="3.00">
-        <route edges="75035877 207143229#1 207143229#2"/>
-    </vehicle> -->
-
-
-
-
     <vehicle id="0" depart="0.00">
-        <route edges="341671964#3 341671964#4 341671964#5 341671964#6"/>
+        <!-- <route edges="72145316#4 72145316#5 30149869#3 30149869#4"/> -->
+        <route edges="72145316#4 72145316#5 30149869#3 30149869#4 30149869#5 30149869#6 "/>
+        <!-- <route edges="15469696#1 15289979#5 164103413#1 164103413#2 164103413#3 164103413#4 164103413#5"/> -->
+        
     </vehicle>
-    <vehicle id="1" depart="1.00">
-        <route edges="15469696#4 15240255#3 15240255#4"/>
-    </vehicle>
-    <vehicle id="3" depart="3.00">
-        <route edges="75035877 207143229#1 207143229#2 207143229#3 "/>
-    </vehicle>
-    <vehicle id="4" depart="4.00">
-        <route edges="207143229#0 207143229#1 207143229#2 "/>
-    </vehicle>
-    <vehicle id="5" depart="5.00">
-        <route edges="15240247 15240253#0 15240253#1 "/>
-    </vehicle>
-    <vehicle id="6" depart="6.00">
-        <route edges="-201336950 201336951 371430736#1 14484065"/>
-    </vehicle>
-
-    <vehicle id="7" depart="3.00">
-        <route edges="75035877 207143229#1 207143229#2"/>
-    </vehicle> 
-    
+ 
     
 </raiz>
 

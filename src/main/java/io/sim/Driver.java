@@ -34,6 +34,8 @@ public class Driver extends Thread {
             saida = new DataOutputStream(this.socket.getOutputStream());
 
             Thread a1 = new Thread(auto);
+            // long t0 = System.nanoTime();
+            // System.out.println("start car = " + t0);
             a1.start();
             abastecer();
             // quando carro finalizar, indica ao banco para finalizar a thread de comunicação
@@ -67,11 +69,11 @@ public class Driver extends Thread {
                 Thread.sleep(500);
             
                 if(this.auto.getAbastecer()){ 
-                    
-                    FuelStation.abastecerCarro(this.auto, 7000);
-                                       
+                                      
                     BotPayment bot = new BotPayment(saida, this.conta.getId(), this.conta.getLogin(),this.conta.getSenha(),1,7*this.auto.getFuelPrice());
                     bot.start();
+                    
+                    FuelStation.abastecerCarro(this.auto, 7000);
                                   
                 }       
             }        

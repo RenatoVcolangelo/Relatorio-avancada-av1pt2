@@ -38,7 +38,9 @@ public class Itinerary {
 					Node node = elem.getElementsByTagName("route").item(0);
 					Element edges = (Element) node;
 					this.itinerary = new String[] { idRouteAux, edges.getAttribute("edges") };
-					listaRoutes.add(new Rota(Integer.toString(i),edges.getAttribute("edges")));
+					for(int a = 0; a < 1; a++){
+
+						listaRoutes.add(new Rota(Integer.toString(a),edges.getAttribute("edges")));}
 					
 				}
 			}

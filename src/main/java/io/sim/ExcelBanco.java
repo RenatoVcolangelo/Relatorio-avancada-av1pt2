@@ -9,6 +9,8 @@ public class ExcelBanco extends Thread{
 
     @Override
     public void run(){
+        // long t0 = System.nanoTime();
+        // System.out.println("run excel = " + t0);
         try{
 
         while(Banco.ativo){
@@ -16,6 +18,8 @@ public class ExcelBanco extends Thread{
                 Relatorio.manipulaExcelTransacao(Banco.transacoes.remove(0));
             }
             Thread.sleep(100);
+            // long t1 = System.nanoTime();
+        	// System.out.println("fim excel = " + t1);
         }
 
     } catch(Exception e){

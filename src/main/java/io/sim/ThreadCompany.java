@@ -30,6 +30,9 @@ public class ThreadCompany extends Thread{
     @Override
     public void run(){
 
+        // long t0 = System.nanoTime();
+        // System.out.println("run thread = " + t0);
+
             try {
                 // conecta com o carro e tem acesso a conexão da company com o banco
                 DataOutputStream saida = new DataOutputStream(carroSocket.getOutputStream());
@@ -103,7 +106,8 @@ public class ThreadCompany extends Thread{
                     saida.close();
   
                 }
-
+                // long t1 = System.nanoTime();
+                // System.out.println("fim thread = " + t1);
 
             }
 

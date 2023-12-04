@@ -29,9 +29,13 @@ public class Banco extends Thread{
 
 	public void run(){
 		try {
+			// long t0 = System.nanoTime();
+        	// System.out.println("run thread = " + t0);
 			// cria relatório das transações
 			Relatorio.criaExcelTransacao();
 			ExcelBanco excelBanco = new ExcelBanco(this);
+			// long t0 = System.nanoTime();
+        	// System.out.println("start excel = " + t0);
 			excelBanco.start();
 
 			for(int i = 0; i < EnvSimulator.totalDrivers+2; i++) { // +2 pois company e fuel station
@@ -39,10 +43,13 @@ public class Banco extends Thread{
 					Socket clienteSocket = serverSocket.accept(); // Espera por uma conexão
 
 					ThreadBanco thread = new ThreadBanco(clienteSocket,this);
-					threads.add(thread);		
+					threads.add(thread);	
 					thread.start(); 
 			}
 			
+			// long t1 = System.nanoTime();
+        	// System.out.println("fim banco = " + t1);
+
 			// espera conexões fecharem
 			for(ThreadBanco t: threads){
 				t.join();

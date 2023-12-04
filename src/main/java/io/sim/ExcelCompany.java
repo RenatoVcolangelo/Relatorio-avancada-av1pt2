@@ -9,6 +9,8 @@ public class ExcelCompany extends Thread{
 
     @Override
     public void run(){
+        // long t0 = System.nanoTime();
+        // System.out.println("run excel = " + t0);
         try{
 
         while(Company.ativo){
@@ -17,6 +19,8 @@ public class ExcelCompany extends Thread{
                 Relatorio.manipulaExcelAuto(Company.reportData.remove(0));
             }
             Thread.sleep(100);
+            // long t1 = System.nanoTime();
+            // System.out.println("fim excel = " + t1);
         }
 
     } catch(Exception e){

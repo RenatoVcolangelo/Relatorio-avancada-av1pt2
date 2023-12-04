@@ -12,16 +12,20 @@ public class Step extends Thread {
     @Override
     public void run(){
         while(Company.ativo){
+            // long t1 = System.nanoTime();
+       		// System.out.println("inicio loop = " + t1);
 				
             if(!sumo.isClosed()){
                 try {
-                        Thread.sleep(50);
+                        Thread.sleep(100);
                         this.sumo.do_timestep();
                     } catch (Exception e) {
 
                         break;
                     }
             }
+            // long t2 = System.nanoTime();
+       		// System.out.println("fim loop = " + t2);
         }
         this.sumo.close();
     }

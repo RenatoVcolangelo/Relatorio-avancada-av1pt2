@@ -12,7 +12,7 @@ public class EnvSimulator extends Thread{
 	private Company company;
 	private Banco alpha;
 	private FuelStation fuelStation;
-	public static int totalDrivers = 100;
+	public static int totalDrivers = 1;
 	
 
     public EnvSimulator(){
@@ -37,18 +37,26 @@ public class EnvSimulator extends Thread{
 			System.out.println("sumo on");
 
 			// Pega as rotas 
-			Itinerary i1= new Itinerary("data/dados.xml", "0");
+			Itinerary i1= new Itinerary("data/dados2.xml", "0");
 
 			// Cria o banco
 			this.alpha = new Banco(22222);
+			// long t0 = System.nanoTime();
+        	// System.out.println("start banco = " + t0);
 			this.alpha.start();
 
 			// Cria o posto de combustível
+
+			// long t0 = System.nanoTime();
+       		// System.out.println("Start posto = " + t0);
 			this.fuelStation = new FuelStation();
 			this.fuelStation.start();
+			
 
 			// Cria a Company
 			this.company = new Company(i1.getRoutes(), totalDrivers, 55555);
+			// long t0 = System.nanoTime();
+       		// System.out.println("Start company = " + t0);
 			this.company.start();
 
 			// Cria a classe que faz a passagem de tempo no sumo
@@ -75,7 +83,7 @@ public class EnvSimulator extends Thread{
 
 				// i + 1 pois as contas dos drivers começa em 2
 
-				Auto a1 = new Auto(i+1, "Car " + Integer.toString(i), green,"D"+ i, sumo, 100, fuelType, fuelPreferential, fuelPrice, personCapacity, personNumber);
+				Auto a1 = new Auto(i+1, "Car " + Integer.toString(i), green,"D"+ i, sumo, 300, fuelType, fuelPreferential, fuelPrice, personCapacity, personNumber);
 
 				Driver d = new Driver(a1,i);
 				drivers.add(d);

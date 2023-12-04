@@ -26,6 +26,8 @@ public class FuelStation extends Thread{
 
     // Cria a conexão com o banco, mas como a fuel station nao faz pagamentos a conexão ja é fechada
     public void run(){
+        // long t0 = System.nanoTime();
+        // System.out.println("Inicio execucao Posto = " + t0);
 
         try {
             this.socket = new Socket("127.0.0.1",22222); // conexão com o banco
@@ -42,6 +44,7 @@ public class FuelStation extends Thread{
 
             DataOutputStream saida;
             try{
+                Thread.sleep(500);
                 saida = new DataOutputStream(socket.getOutputStream());
                 byte[] cripto = Criptografia.encrypt(obj.toString());
                 saida.writeInt(cripto.length);
@@ -52,8 +55,10 @@ public class FuelStation extends Thread{
             } catch (Exception e){
 
             }
-            
-		System.out.println("Posto off");	
+        System.out.println("Posto oFF");
+        // long t1 = System.nanoTime();
+        // System.out.println("Fim da execucao Posto = " + t1);
+
 
     }
 
@@ -66,7 +71,7 @@ public class FuelStation extends Thread{
         try {
             semaforo.acquire(); // aceita a threda
             System.out.println(auto.getIdAuto() + " está sendo atendido.");
-            Thread.sleep(120000); // Simula o tempo de abastecimento 2min
+            Thread.sleep(5000); // Simula o tempo de abastecimento 2min
             auto.setFuelTank(qtd); // adciona combustivel no carro
             System.out.println(auto.getIdAuto() + " abastecido");
         } catch (InterruptedException e) {

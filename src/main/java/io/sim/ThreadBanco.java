@@ -27,6 +27,7 @@ public class ThreadBanco extends Thread{
     public void run() {
 
         try {
+            
             // recebe dados do botpayment
             DataInputStream entrada = new DataInputStream(socket.getInputStream());
 
