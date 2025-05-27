@@ -84,7 +84,7 @@ public class Auto extends Vehicle implements Runnable{
 
 		// long t00 = System.nanoTime();
         // System.out.println("run auto = " + t00);
-		Relatorio.criaExcelReconciliacao();
+		//Relatorio.criaExcelReconciliacao();
 		System.out.println(this.idAuto + " on");
 
         try {
@@ -269,7 +269,7 @@ public class Auto extends Vehicle implements Runnable{
 				System.out.println("Total = " + total);
 				System.out.println("Dist Total = " + distancia); 
 				// escreve no relatorio
-				Relatorio.manipulaExcelRec(tempos, distancias);
+				//Relatorio.manipulaExcelRec(tempos, distancias);
 
 				System.out.println(this.idAuto + " acabou a rota.");
 

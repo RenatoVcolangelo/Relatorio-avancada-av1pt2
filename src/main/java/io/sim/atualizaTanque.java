@@ -8,7 +8,7 @@ public class atualizaTanque extends Thread{
     private SumoTraciConnection sumo;
 
     // Classe que atualiza o tanque de combustivel
-    // getFuelConsuption estava tirando muito, por isso padronizeie em 50ml/s
+    // getFuelConsuption removia demais, então foi padronizado uma remoção de 100ml/s
 
     public atualizaTanque(Auto auto, SumoTraciConnection sumo){
         this.auto = auto;
@@ -41,7 +41,7 @@ public class atualizaTanque extends Thread{
 
                     while(!this.auto.getAbastecer() && this.auto.isOn_off()){
 
-                        this.auto.setFuelTank(-50);
+                        this.auto.setFuelTank(-100);
                         // se menor que 3000 o carro para e espera abastecer
                         if(this.auto.getFuelTank() < 3000){
 
@@ -50,7 +50,7 @@ public class atualizaTanque extends Thread{
                             sumo.do_job_set(Vehicle.setSpeed(this.auto.getIdAuto(), 0));
                             
                         }                    
-                        Thread.sleep(1000); // a cada um segundo retira 50ml
+                        Thread.sleep(1000); // a cada um segundo retira 100ml
                         // long t0 = System.nanoTime();
                         // System.out.println("fim tanque = " + t0);
                         } 
