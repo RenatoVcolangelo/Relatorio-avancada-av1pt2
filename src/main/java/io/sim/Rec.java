@@ -1,27 +1,69 @@
 package io.sim;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class Rec {
 
 	public static void main(String[] args) {
+		try {
+			// Abrir a planilha Recon.xlsx
+			FileInputStream file = new FileInputStream("Recon.xlsx");
+			Workbook workbook = new XSSFWorkbook(file);
+			Sheet sheet = workbook.getSheetAt(0);
 
-		// F1 + F2 +  F3 + F4 + F5 = F6
-		// =====>O=====>O=====>O=====> ======>
+			// Pegar a última linha com dados (valores de tempo)
+			int lastRow = sheet.getLastRowNum();
+			Row row = sheet.getRow(lastRow);
 
+			ArrayList<Double> tempos = new ArrayList<>();
+			for (int i = 1; i <= 6; i++) {
+				Cell cell = row.getCell(i);
+				tempos.add(cell.getNumericCellValue());
+			}
 
-		
-		double[] y = new double[]{10.687,	2.866,7.517,	7.915,	7.476,	35};
-		// double[] y = new double[]{87.712,	21.563,	57.918,	57.411,	55.185,	279.789
-		// };
+			// Converter para array de double
+			double[] y = tempos.stream().mapToDouble(Double::doubleValue).toArray();
 
-		double[] v = new double[]{1.656,	0.528,	1.519, 0.602, 0.696, 3.683
-		};
+			// Calcular média
+			double media = 0;
+			for (double t : y) {
+				media += t;
+			}
+			media /= y.length;
 
-		double[][] A = new double[][] { { -1, -1, -1, -1,-1,1}};
+			// Calcular desvio padrão (dinâmico)
+			double[] v = new double[y.length];
+			for (int i = 0; i < y.length; i++) {
+				v[i] = Math.sqrt(Math.pow(y[i] - media, 2));
+			}
 
+			// Matriz de incidência: somatório dos fluxos = fluxo total
+			double[][] A = new double[][] { { -1, -1, -1, -1, -1, 1 } };
 
-		Reconciliation rec = new Reconciliation(y, v, A);
-		System.out.println("Y_hat:");
-		rec.printMatrix(rec.getReconciledFlow());
+			// Executar reconciliação
+			Reconciliation rec = new Reconciliation(y, v, A);
+			double[] y_hat = rec.getReconciledFlow();
+
+			System.out.println("Y_hat:");
+			rec.printMatrix(y_hat);
+
+			// Converter resultado reconciliado para listas
+			List<Double> temposReconciliados = new ArrayList<>();
+			for (double d : y_hat) temposReconciliados.add(d);
+
+			// Neste exemplo, usaremos os mesmos valores reconciliados como distância fictícia
+			//Relatorio.manipulaExcelRecReconciliado(temposReconciliados, temposReconciliados);
+
+			workbook.close();
+			file.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
 }

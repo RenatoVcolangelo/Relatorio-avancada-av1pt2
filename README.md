@@ -9,7 +9,7 @@ After that, use Maven commands using Terminal to install the dependencies found 
 Example of command using Terminal:
 mvn install:install-file -Dfile="YOURPATH\vscode-workspace\sim\lib\libsumo-1.18.0.jar" -DgroupId="libsumo-1.18.0" -DartifactId="libsumo-1.18.0" -Dversion="libsumo-1.18.0" -Dpackaging="jar" -DgeneratePom=true
 
-This command will enable what you can found in the Pom.xml file:
+This command will enable what you can found in the Pom.xml file
 
 ![image](https://github.com/21lab-technology/sim/assets/94874350/5f4e1f33-5a2b-4a5f-aacc-5ebf0c3b3df6)
 

@@ -1,4 +1,3 @@
-
 package io.sim;
 
 import org.ejml.data.DMatrixRMaj;

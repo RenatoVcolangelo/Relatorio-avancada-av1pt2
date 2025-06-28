@@ -82,8 +82,9 @@ public class Auto extends Vehicle implements Runnable{
 	@Override
 	public void run() {
 
-		// long t00 = System.nanoTime();
-        // System.out.println("run auto = " + t00);
+		//long t00 = System.nanoTime();
+        //System.out.println("Início da Execucao Auto = " + t00);
+		Relatorio.criaExcelReconciliacao();
 		System.out.println(this.idAuto + " on");
 
         try {
@@ -94,9 +95,9 @@ public class Auto extends Vehicle implements Runnable{
 
 			// cria instacia para atualizar o tanque e parar quando < 3L
 			atualizaTanque at  = new atualizaTanque(this, sumo); 
-			// long ta = System.nanoTime();
-            // System.out.println("start tanque = " + ta);
-			//at.start();
+			long ta = System.nanoTime();
+            System.out.println("Fila de Pronto atualizaTanque = " + ta);
+			at.start();
             while (!finalizado) { 
 				
 				// reinicia distancia percorrida
@@ -151,8 +152,8 @@ public class Auto extends Vehicle implements Runnable{
 
 	
                 ts = new TransportService(this.idAuto,this,this.sumo,route);
-				// long to = System.nanoTime();
-            	// System.out.println("start ts = " + to);
+				//long to = System.nanoTime();
+            	//System.out.println("Fila de pronto TransportService = " + to);
                 ts.start();
 				ts.setPriority(10);
 				// espera o TransportService adicionar o carro ao SUMO
@@ -248,8 +249,8 @@ public class Auto extends Vehicle implements Runnable{
 					}
 
 						atualizaSensores();
-						// long t11 = System.nanoTime();
-						// System.out.println("fim car = " + t11);
+						//long t11 = System.nanoTime();
+						//System.out.println("fim Execucao Auto = " + t11);
                 }
 
 				// pega o ultimo tempo parcial e total, assim como distancia 
@@ -267,9 +268,13 @@ public class Auto extends Vehicle implements Runnable{
 				distancias.add(distancia);
 				System.out.println("Total = " + total);
 				System.out.println("Dist Total = " + distancia); 
+				// escreve no relatorio
+				Relatorio.manipulaExcelRec(tempos, distancias);
+
 				System.out.println(this.idAuto + " acabou a rota.");
 
 				this.Executadas.add(route);
+				
 				this.autoState = "esperando";
 				// indica para a company que finalizou a rota
 				obj.put("autoState", "rotaFinalizada");
