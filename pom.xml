@@ -95,7 +95,7 @@
     <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi</artifactId>
-        <version>5.0.0</version> <!-- Use a versão mais recente do Apache POI -->
+        <version>5.0.0</version> <!-- Usa a versão mais recente do Apache POI -->
     </dependency>
     
     <dependency>
